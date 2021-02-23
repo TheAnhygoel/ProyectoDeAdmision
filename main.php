@@ -46,6 +46,9 @@
     <!-- Directorio de guardado -->
 
     <?php
+
+use function PHPSTORM_META\type;
+
     $localhost = "Localhost";
     $dbusername = "root";
     $dbpassword = "";
@@ -94,27 +97,71 @@
             <th>Titulo</th>
             <th>Autor</th>
             <th>Archivo</th>
-            <th>Modificar/Eliminar</th>
+            <th>EDITAR</th>
+            <th>ELIMINAR</th>
          </tr>";
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>" .
-                "<td>" . $row["title"]   . "</td>" .
-                "<td>" . $row["author"]  . "</td>" .
-                "<td>" . substr($row["archive"], 5) . "</td>" .
-                "<td><i class=\"fa fa-edit\"></i>&nbsp;<i class=\"fa fa-trash\"></i></td>" .
-                "</tr>";
-        }
-        echo "</table>";
+        while ($row = $result->fetch_assoc()) {?>
+            <form class='artisttable' method ='post'>
+            <tr>
+                <td><input type='text' name ='title' value ='<?php echo $row['title'];?>' /></td>
+                <td><input type='text' name ='author' value ='<?php echo $row["author"];?>' /></td>
+                <td><input type='text' name ='archive' value ='<?php echo $row["archive"];?>' /></td>
+                <td><input type='submit' name ='update' value='ACTUALIZAR'></td>
+                <td><input type='submit' name ='delete' value='ELIMINAR'></td>
+                <td><input type = 'hidden' name ='hidden' value='<?php echo $row['fileid'];?>' /></td>
+            </tr>
+        </form>
+    <?php } ?>
+         
+    
+
+        
+
+    
+    <?php } ?>
+    
+    <!-- script de edit/erase -->
+    </table>
+    <?php
+    if (isset($_POST['update'])) {
+        $id = $_POST['hidden'];
+        $currenttitle = $_POST['title'];
+        $currentAuthor = $_POST['author'];
+        $currentArchive = $_POST['archive'];
+    
+        mysqli_query($conn, "UPDATE fileup SET title='$currenttitle', author='$currentAuthor', archive='$currentArchive' WHERE fileid=$id");
+        header('location: main.php');
+    }
+     
+  
+    ?>
+
+    <?php
+      if (isset($_POST['delete'])) {
+        $fileid = $_POST['hidden'];
+        
+        mysqli_query($conn, "DELETE FROM fileup WHERE fileid=$fileid");
+        $_SESSION['message'] = "Address deleted!"; 
+        #scriptqueborraelarchivo
+        $archivedeleted = $_POST['archive'];
+       
+        
+        $file_to_delete =  "./libros/" . $archivedeleted;
+        echo $file_to_delete;
+        unlink($file_to_delete);
+
+    
+        header('location: main.php');
+
+        
     }
 
-
-
-
-
+    
+   
     ?>
+    
 
 
 
 </body>
-
 </html>
